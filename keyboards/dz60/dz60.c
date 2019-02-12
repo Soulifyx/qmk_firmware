@@ -1,9 +1,26 @@
 #include "dz60.h"
 #include "led.h"
 
+/*typedef union {
+  uint32_t raw;
+  struct {
+    bool     rgb_layer_change :1;
+  };
+} user_config_t;
+
+user_config_t user_config;
+
 void matrix_init_kb(void) {
   // Keyboard start-up code goes here
   // Runs once when the firmware starts up
+  user_config.raw = eeconfig_read_user();
+
+  if(user_config.rgb_layer_change) {
+    rgblight_enable_noeeprom();
+    rgblight_sethsv_noeeprom_turquoise(); 
+    rgblight_mode_noeeprom(1);
+  }
+
   matrix_init_user();
   led_init_ports();
 };
@@ -29,4 +46,4 @@ void led_set_kb(uint8_t usb_led) {
     }
 
     led_set_user(usb_led);
-}
+}*/
