@@ -8,6 +8,54 @@ enum keyboard_layers {
   _CALC,      // Function Layer
   RGB_LYR
 };
+
+enum tap_dance{
+  SINGLE_TAP = 1,
+  SINGLE_HOLD,
+  DOUBLE_TAP,
+  DOUBLE_HOLD,
+  TRIPLE_TAP,
+  TRIPLE_HOLD
+};
+
+//Tap dance enums
+enum {
+  ALT_OSRAISE = 0,
+  RESET_BTN
+};
+
+typedef union {
+  uint32_t raw;
+  struct {
+    bool     rgb_layer_change :1;
+  };
+} user_config_t;
+
+user_config_t user_config;
+
+static int alttap_state = 0;
+static int resettap_state = 0;
+
+void matrix_init_kb(void);
+void matrix_scan_kb(void);
+void eeconfig_init_user(void); // EEPROM is getting reset! 
+void led_init_ports(void);
+void led_set_kb(uint8_t usb_led);
+
+//rgb underglow indicate layer
+uint32_t layer_state_set_user(uint32_t state);
+bool process_record_user(uint16_t keycode, keyrecord_t *record);
+
+//tap dance
+int cur_dance (qk_tap_dance_state_t *state);
+
+//1. tap dance alt
+void alt_finished (qk_tap_dance_state_t *state, void *user_data);
+void alt_reset (qk_tap_dance_state_t *state, void *user_data);
+
+//2. tap dance reset layer 3
+void reset_finished (qk_tap_dance_state_t *state, void *user_data);
+void reset_reset (qk_tap_dance_state_t *state, void *user_data);
   
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   /*
@@ -21,7 +69,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * |--------------------------------------------------------------------|
    * |Shift ( |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|Shift )   | ^ | ?/ |
    * |--------------------------------------------------------------------|
-   * |Ctrl|Gui |Alt |      Space            |  TG 1|  TG 2  | <  | V |  > |
+   * |Ctrl|Gui |SPAlt|      Space           |  TG 1|  TG 2  | <  | V |  > |
    * `--------------------------------------------------------------------'
   */
 
@@ -30,7 +78,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TAB,      KC_Q,      KC_W,      KC_E,      KC_R,      KC_T,      KC_Y,      KC_U,      KC_I,      KC_O,      KC_P,      KC_LBRC,      KC_RBRC,     KC_BSLS,      
     KC_CAPS,     KC_A,      KC_S,      KC_D,      KC_F,      KC_G,      KC_H,      KC_J,      KC_K,      KC_L,      KC_SCLN,   KC_QUOT,      KC_ENT,      
     KC_LSPO,     KC_Z,      KC_X,      KC_C,      KC_V,      KC_B,      KC_N,      KC_M,      KC_COMM,   KC_DOT,    KC_RSPC,   KC_UP,        KC_SLSH,      
-    KC_LCTL,     KC_LGUI,   KC_LALT,   KC_SPC,    KC_SPC,    KC_SPC,    TG(1),     TG(2),     KC_LEFT,   KC_DOWN,   KC_RGHT),
+    KC_LCTL,     KC_LGUI,   TD(ALT_OSRAISE),   KC_SPC,    KC_SPC,    KC_SPC,    TG(_FKEYS),     TG(_CALC),     KC_LEFT,   KC_DOWN,   KC_RGHT),
   
  // Keymap: (FKeys Layer) Layer 1
  //        * ,-----------------------------------------------------------.
@@ -42,7 +90,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  //        * |-----------------------------------------------------------|
  //  led   * |#####   |Tog|Cyc| On|Off| +|  -| Br|   |   |#####|VOL|Mute |
  //        * |-----------------------------------------------------------|
- //        * |####|### |### |      #####       |####|#### |Prev|vol |Next|
+ //        * |####|### |Alt |      #####       |####|#### |Prev|vol |Next|
  //        * `-----------------------------------------------------------'
 
   [_FKEYS] = LAYOUT_60_b_ansi(
@@ -50,7 +98,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     RGB_LYR,     RGB_TOG,    RGB_MOD,    RGB_RMOD,   RGB_HUI,    RGB_HUD,    RGB_SAI,    RGB_SAD,    RGB_VAI,    RGB_VAD,    RGB_SPI,     RGB_SPD,     KC_NO,       KC_PSCR,      
     KC_TRNS,     RGB_M_P,    RGB_M_B,    RGB_M_R,    RGB_M_SW,   RGB_M_SN,   RGB_M_K,    RGB_M_X,    RGB_M_G,    KC_NO,      KC_NO,       KC_NO,       KC_TRNS,      
     KC_TRNS,     BL_TOGG,    BL_STEP,    BL_ON,      BL_OFF,     BL_INC,     BL_DEC,     BL_BRTG,    KC_NO,      KC_NO,      KC_TRNS,     KC_VOLU,     KC_MUTE,      
-    KC_TRNS,     KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_MPRV,    KC_VOLD,    KC_MNXT),
+    KC_TRNS,     KC_TRNS,    KC_LALT,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_MPRV,    KC_VOLD,    KC_MNXT),
 	
   /*
      Keymap: (_CALC Layer) Layer 2
@@ -71,18 +119,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TRNS,    KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_BSPC,      KC_BSPC,      
     KC_NO,      KC_P7,        KC_P8,        KC_P9,        KC_NO,        KC_NO,      KC_NO,      KC_NO,      KC_PSLS,    KC_PAST,    KC_PMNS,    KC_PPLS,    KC_NO,      KC_TRNS,      
     KC_NO,      KC_P4,        KC_P5,        KC_P6,        KC_NO,        KC_NO,      KC_NO,      KC_PDOT,    KC_PCMM,    KC_NO,      KC_NO,      KC_NO,      KC_PENT,      
-    KC_NO,      KC_P1,        KC_P2,        KC_P3,        KC_NO,        KC_NO,      KC_PEQL,    KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_UP,      RESET,
+    KC_NO,      KC_P1,        KC_P2,        KC_P3,        KC_NO,        KC_NO,      KC_PEQL,    KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_UP,      TD(RESET_BTN),
     KC_NO,      KC_NO,        KC_TRNS,      KC_P0,        KC_P0,        KC_P0,      KC_NO,      KC_TRNS,    KC_LEFT,    KC_DOWN,    KC_RGHT)
 };
-
-typedef union {
-  uint32_t raw;
-  struct {
-    bool     rgb_layer_change :1;
-  };
-} user_config_t;
-
-user_config_t user_config;
 
 void matrix_init_kb(void) {
   // Keyboard start-up code goes here
@@ -104,6 +143,16 @@ void matrix_scan_kb(void) {
   // This runs every cycle (a lot)
   matrix_scan_user();
 };
+
+void eeconfig_init_user(void) {  // EEPROM is getting reset! 
+  user_config.rgb_layer_change = true; // We want this enabled by default
+  eeconfig_update_user(user_config.raw); // Write default value to EEPROM now
+
+  // use the non noeeprom versions, to write these values to EEPROM too
+  rgblight_enable(); // Enable RGB by default
+  rgblight_sethsv_turquoise();  // Set it to CYAN by default
+  rgblight_mode(1); // set to solid by default
+}
 
 void led_init_ports(void) {
   // Set caps lock LED pin as output
@@ -148,7 +197,7 @@ uint32_t layer_state_set_user(uint32_t state) { // Runs everytime changing layer
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) { // Adds another event on top of the original function of the pressed key
-  // Returns true if the 66666666666655original function still wants to be run
+  // Returns true if the original function still wants to be run
   // Returns false to only run the added event and cancel the original function of the key
 
   switch (keycode) {
@@ -174,12 +223,57 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) { // Adds anothe
   }
 }
 
-void eeconfig_init_user(void) {  // EEPROM is getting reset! 
-  user_config.rgb_layer_change = true; // We want this enabled by default
-  eeconfig_update_user(user_config.raw); // Write default value to EEPROM now
-
-  // use the non noeeprom versions, to write these values to EEPROM too
-  rgblight_enable(); // Enable RGB by default
-  rgblight_sethsv_turquoise();  // Set it to CYAN by default
-  rgblight_mode(1); // set to solid by default
+int cur_dance (qk_tap_dance_state_t *state) {
+  if (state->count == 1) {
+    if (state->pressed) return SINGLE_HOLD;
+    else return SINGLE_TAP;
+  }
+  else if (state->count == 2) {
+    if (state->pressed) return DOUBLE_HOLD;
+    else return DOUBLE_TAP;
+  }
+  else if (state->count == 3) {
+    if (state->interrupted || !state->pressed)  return TRIPLE_TAP;
+    else return TRIPLE_HOLD;
+  }
+  else return 8;
 }
+
+void alt_finished (qk_tap_dance_state_t *state, void *user_data) {
+  alttap_state = cur_dance(state);
+  switch (alttap_state) {
+    // OSL
+    case SINGLE_TAP: set_oneshot_layer(_FKEYS, ONESHOT_START); clear_oneshot_layer_state(ONESHOT_PRESSED); break; 
+    // ALT
+    case SINGLE_HOLD: register_code(KC_LALT); break; 
+    // DF
+   // case DOUBLE_TAP: set_oneshot_layer(_FKEYS, ONESHOT_START); set_oneshot_layer(_FKEYS, ONESHOT_PRESSED); break; 
+    // ALT + OSL + KEY
+    case DOUBLE_HOLD: register_code(KC_LALT); set_oneshot_layer(_FKEYS, ONESHOT_START); clear_oneshot_layer_state(ONESHOT_PRESSED); break; 
+    //Last case is for fast typing. Assuming your key is `f`:
+    //For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
+    //In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
+  }
+}
+
+void alt_reset (qk_tap_dance_state_t *state, void *user_data) {
+  switch (alttap_state) {
+    case SINGLE_TAP: break;
+    case SINGLE_HOLD: unregister_code(KC_LALT); break;
+    //case DOUBLE_TAP: break;
+    case DOUBLE_HOLD: unregister_code(KC_LALT); break;
+  }
+  alttap_state = 0;
+}
+
+void reset_finished (qk_tap_dance_state_t *state, void *user_data) {
+  resettap_state = cur_dance(state);
+  switch (resettap_state) {
+    case TRIPLE_TAP: reset_keyboard(); break;
+   }
+}
+
+qk_tap_dance_action_t tap_dance_actions[] = {
+  [ALT_OSRAISE]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL,alt_finished, alt_reset),
+  [RESET_BTN]       = ACTION_TAP_DANCE_FN(reset_finished)
+};
