@@ -22,7 +22,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * |Shift ( |  Z|  X|  C|  V|  B|  N|  M|  ,|  .|  /|Shift )   | ^ | ?/ |
    * |--------------------------------------------------------------------|
    * |Ctrl|Gui |Alt |      Space            |  TG 1|  TG 2  | <  | V |  > |
-   * `--------------------------------------------------------------------|
+   * `--------------------------------------------------------------------'
   */
 
 	[_BASE] = LAYOUT_60_b_ansi(
@@ -34,45 +34,45 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   
  // Keymap: (FKeys Layer) Layer 1
  //        * ,-----------------------------------------------------------.
- //        * |`~  |F1| F2| F3| F4| F5| F6| F7| F8| F9| F10| F11| F12| Del|
+ //  FKEY  * |`~  | 1| 2| 3| 4| 5| 6| 7| 8| 9| 10| 11| 12 |     DEL      |
  //        * |-----------------------------------------------------------|
  //  RGB   * |RGB_LY|Tog|MOD|mod|HUE|hue|SAT|sat|VAL|val|SPD|spd|  |Print|
  //        * |-----------------------------------------------------------|
- //  mode  * |       | Pl| Br| Ra| Sw| Sn| Kn| Xm| Gr|   |   |   |Return |
+ //  mode  * |#######| Pl| Br| Ra| Sw| Sn| Kn| Xm| Gr|   |   |   |###### |
  //        * |-----------------------------------------------------------|
- //  led   * |Shift   |Tog|Cyc| On|Off| +|  -| Br|   |   |Shift|VOL|Mute |
+ //  led   * |#####   |Tog|Cyc| On|Off| +|  -| Br|   |   |#####|VOL|Mute |
  //        * |-----------------------------------------------------------|
- //        * |Ctrl|Gui |Alt |      Space       |####|#### |Prev|vol |Next|
+ //        * |####|### |### |      #####       |####|#### |Prev|vol |Next|
  //        * `-----------------------------------------------------------'
 
   [_FKEYS] = LAYOUT_60_b_ansi(
     KC_GRV,      KC_F1,      KC_F2,      KC_F3,      KC_F4,      KC_F5,      KC_F6,      KC_F7,      KC_F8,      KC_F9,      KC_F10,      KC_F11,      KC_F12,      KC_DEL,      KC_DEL,      
     RGB_LYR,     RGB_TOG,    RGB_MOD,    RGB_RMOD,   RGB_HUI,    RGB_HUD,    RGB_SAI,    RGB_SAD,    RGB_VAI,    RGB_VAD,    RGB_SPI,     RGB_SPD,     KC_NO,       KC_PSCR,      
-    KC_NO,       RGB_M_P,    RGB_M_B,    RGB_M_R,    RGB_M_SW,   RGB_M_SN,   RGB_M_K,    RGB_M_X,    RGB_M_G,    KC_NO,      KC_NO,       KC_NO,       KC_ENT,      
-    KC_LSHIFT,   BL_TOGG,    BL_STEP,    BL_ON,      BL_OFF,     BL_INC,     BL_DEC,     BL_BRTG,    KC_NO,      KC_NO,      KC_RSHIFT,   KC_VOLU,     KC_MUTE,      
-    KC_LCTRL,    KC_LGUI,    KC_LALT,    KC_SPC,     KC_SPC,     KC_SPC,     KC_TRNS,    KC_TRNS,    KC_MPRV,    KC_VOLD,    KC_MNXT),
+    KC_TRNS,     RGB_M_P,    RGB_M_B,    RGB_M_R,    RGB_M_SW,   RGB_M_SN,   RGB_M_K,    RGB_M_X,    RGB_M_G,    KC_NO,      KC_NO,       KC_NO,       KC_TRNS,      
+    KC_TRNS,     BL_TOGG,    BL_STEP,    BL_ON,      BL_OFF,     BL_INC,     BL_DEC,     BL_BRTG,    KC_NO,      KC_NO,      KC_TRNS,     KC_VOLU,     KC_MUTE,      
+    KC_TRNS,     KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_MPRV,    KC_VOLD,    KC_MNXT),
 	
   /*
      Keymap: (_CALC Layer) Layer 2
    * ,--------------------------------------------------------------------,
-   * |    | /|  *|  -|  +|   |   |   |   |   |   |   |   |      Backsp    |
+   * |### |## |## |## |## |## |## |## |## |## |## |## |## |     Backsp    |
    * |--------------------------------------------------------------------|
-   * |     |  7|  8|  9|  ,|   |   |   |   |   |   |   |   |              |
+   * |     |  7|  8|  9|   |   |   |   | / | * | - | + |   |    ######    |
    * |--------------------------------------------------------------------|
-   * |       |  4|  5|  6|  .|   |   |   |   |   |   |   |      return    |
+   * |       |  4|  5|  6|   |   |   | . | , |   |   |   |      return    |
    * |--------------------------------------------------------------------|
-   * |        |  1|  2|  3|  =|   |   |   |   |   |   |       | ^ | RESET |
+   * |        |  1|  2|  3|   |   | = |   |   |   |   |       | ^ | RESET |
    * |--------------------------------------------------------------------|
-   * |    |    |    |          0         |      |  ####  | <  | V |  >    |
-   * `--------------------------------------------------------------------|
+   * |    |    |### |          0         |      |  ####  | <  | V |  >    |
+   * `--------------------------------------------------------------------'
   */
 
   [_CALC] = LAYOUT_60_b_ansi(
-    KC_NO,      KC_PSLS,    KC_PAST,    KC_PMNS,    KC_PPLS,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_BSPC,      KC_BSPC,      
-    KC_NO,      KC_P7,      KC_P8,      KC_P9,      KC_PCMM,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      
-    KC_NO,      KC_P4,      KC_P5,      KC_P6,      KC_PDOT,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_PENT,      
-    KC_NO,      KC_P1,      KC_P2,      KC_P3,      KC_PEQL,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_UP,      RESET,
-    KC_NO,      KC_NO,      KC_NO,      KC_P0,      KC_P0,        KC_P0,      KC_NO,      KC_TRNS,    KC_LEFT,    KC_DOWN,    KC_RGHT)
+    KC_TRNS,    KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_BSPC,      KC_BSPC,      
+    KC_NO,      KC_P7,        KC_P8,        KC_P9,        KC_NO,        KC_NO,      KC_NO,      KC_NO,      KC_PSLS,    KC_PAST,    KC_PMNS,    KC_PPLS,    KC_NO,      KC_TRNS,      
+    KC_NO,      KC_P4,        KC_P5,        KC_P6,        KC_NO,        KC_NO,      KC_NO,      KC_PDOT,    KC_PCMM,    KC_NO,      KC_NO,      KC_NO,      KC_PENT,      
+    KC_NO,      KC_P1,        KC_P2,        KC_P3,        KC_NO,        KC_NO,      KC_PEQL,    KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_UP,      RESET,
+    KC_NO,      KC_NO,        KC_TRNS,      KC_P0,        KC_P0,        KC_P0,      KC_NO,      KC_TRNS,    KC_LEFT,    KC_DOWN,    KC_RGHT)
 };
 
 typedef union {
