@@ -36,6 +36,14 @@ user_config_t user_config;
 static int alttap_state = 0;
 static int resettap_state = 0;
 
+// Backlight timeout feature
+#define BACKLIGHT_TIMEOUT 5    // in minutes
+static uint16_t idle_timer = 0;
+static uint8_t halfmin_counter = 0;
+bool status = true; 
+
+uint8_t layer;
+
 void matrix_init_kb(void);
 void matrix_scan_kb(void);
 void eeconfig_init_user(void); // EEPROM is getting reset! 
@@ -142,6 +150,23 @@ void matrix_scan_kb(void) {
   // Looping keyboard code goes here
   // This runs every cycle (a lot)
   matrix_scan_user();
+
+  if (idle_timer == 0) 
+  {
+    idle_timer = timer_read();
+  }
+
+  if(timer_elapsed(idle_timer) > 30000){
+    halfmin_counter++;
+    idle_timer = timer_read();
+  }
+
+  if(halfmin_counter >= BACKLIGHT_TIMEOUT * 2){
+    status = false;
+    backlight_disable();
+    rgblight_mode_noeeprom(2); rgblight_sethsv_noeeprom(270,200,30);
+    halfmin_counter = 0;
+  }
 };
 
 void eeconfig_init_user(void) {  // EEPROM is getting reset! 
@@ -171,20 +196,10 @@ void led_set_kb(uint8_t usb_led) {
     led_set_user(usb_led);
 }
 
-/*void suspend_power_down_user(void) // When idle suspend RGB underglow
-{
-    rgb_matrix_set_suspend_state(true);
-}
-
-void suspend_wakeup_init_user(void) // Turns on RGB underglow if user wakes up
-{
-    rgb_matrix_set_suspend_state(false);
-}*/
-
 uint32_t layer_state_set_user(uint32_t state) { // Runs everytime changing layer
     switch (biton32(state)) {
     case _CALC:
-        if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(4); rgblight_sethsv_noeeprom_coral();  } //4
+        if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(15); rgblight_sethsv_noeeprom_coral();  } //4
         break;
     case _FKEYS:
         if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(14); rgblight_sethsv_noeeprom(0,210,120); } //14
@@ -199,6 +214,29 @@ uint32_t layer_state_set_user(uint32_t state) { // Runs everytime changing layer
 bool process_record_user(uint16_t keycode, keyrecord_t *record) { // Adds another event on top of the original function of the pressed key
   // Returns true if the original function still wants to be run
   // Returns false to only run the added event and cancel the original function of the key
+  if(record->event.pressed){
+
+      idle_timer = timer_read();
+      halfmin_counter = 0;
+
+    if(!status){
+      layer = biton32(layer_state);
+      backlight_enable();
+      status = true;
+
+      switch (layer) {
+      case _CALC:
+          if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(15); rgblight_sethsv_noeeprom_coral();  } //4
+          break;
+      case _FKEYS:
+          if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(14); rgblight_sethsv_noeeprom(0,210,120); } //14
+          break;
+      default: //  for any other layers, or the default layer
+          if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(1); rgblight_sethsv_noeeprom_turquoise(); }
+          break;
+      }
+    }
+  }
 
   switch (keycode) {
     case RGB_LYR:  // This allows me to use underglow as layer indication, or as normal
