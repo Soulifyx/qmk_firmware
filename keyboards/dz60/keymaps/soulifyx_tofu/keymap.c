@@ -20,8 +20,11 @@ enum tap_dance{
 
 //Tap dance enums
 enum {
-  ALT_OSRAISE = 0,
-  RESET_BTN
+  ALT_OSRAISE = 0
+};
+
+enum combos {
+  BSP_PENT
 };
 
 typedef union {
@@ -34,7 +37,6 @@ typedef union {
 user_config_t user_config;
 
 static int alttap_state = 0;
-static int resettap_state = 0;
 
 // Backlight timeout feature
 #define BACKLIGHT_TIMEOUT 5    // in minutes
@@ -127,7 +129,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TRNS,    KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_BSPC,      KC_BSPC,      
     KC_NO,      KC_P7,        KC_P8,        KC_P9,        KC_NO,        KC_NO,      KC_NO,      KC_NO,      KC_PSLS,    KC_PAST,    KC_PMNS,    KC_PPLS,    KC_NO,      KC_TRNS,      
     KC_NO,      KC_P4,        KC_P5,        KC_P6,        KC_NO,        KC_NO,      KC_NO,      KC_PDOT,    KC_PCMM,    KC_NO,      KC_NO,      KC_NO,      KC_PENT,      
-    KC_NO,      KC_P1,        KC_P2,        KC_P3,        KC_NO,        KC_NO,      KC_PEQL,    KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_UP,      TD(RESET_BTN),
+    KC_NO,      KC_P1,        KC_P2,        KC_P3,        KC_NO,        KC_NO,      KC_PEQL,    KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_UP,      KC_NO,
     KC_NO,      KC_NO,        KC_TRNS,      KC_P0,        KC_P0,        KC_P0,      KC_NO,      KC_TRNS,    KC_LEFT,    KC_DOWN,    KC_RGHT)
 };
 
@@ -194,6 +196,27 @@ void led_set_kb(uint8_t usb_led) {
     }
 
     led_set_user(usb_led);
+}
+
+//COMBO FOR RESET BUTTON
+
+const uint16_t PROGMEM rst_combo[] = {KC_BSPC, KC_PENT, COMBO_END};
+
+combo_t key_combos[COMBO_COUNT] = {
+  [BSP_PENT] = COMBO_ACTION(rst_combo)
+};
+
+void process_combo_event(uint8_t combo_index, bool pressed) {
+  switch(combo_index) {
+    case BSP_PENT:
+      if (pressed) {
+        layer = biton32(layer_state);
+        if(layer == _CALC){
+          reset_keyboard();
+        }
+      }
+      break;
+  }
 }
 
 uint32_t layer_state_set_user(uint32_t state) { // Runs everytime changing layer
@@ -304,14 +327,8 @@ void alt_reset (qk_tap_dance_state_t *state, void *user_data) {
   alttap_state = 0;
 }
 
-void reset_finished (qk_tap_dance_state_t *state, void *user_data) {
-  resettap_state = cur_dance(state);
-  switch (resettap_state) {
-    case TRIPLE_TAP: reset_keyboard(); break;
-   }
-}
-
 qk_tap_dance_action_t tap_dance_actions[] = {
-  [ALT_OSRAISE]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL,alt_finished, alt_reset),
-  [RESET_BTN]       = ACTION_TAP_DANCE_FN(reset_finished)
+  [ALT_OSRAISE]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL,alt_finished, alt_reset)
 };
+
+

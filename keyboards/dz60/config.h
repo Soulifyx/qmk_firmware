@@ -48,4 +48,7 @@
 /* Tap Dance */
 #define TAPPING_TERM 200
 
+/* Combo */
+#define COMBO_COUNT 1
+
 #endif

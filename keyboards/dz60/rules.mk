@@ -55,5 +55,6 @@ BACKLIGHT_ENABLE = yes  # Enable keyboard backlight functionality
 AUDIO_ENABLE = no
 RGBLIGHT_ENABLE = yes
 TAP_DANCE_ENABLE= yes
+COMBO_ENABLE = yes
 
 LAYOUTS = 60_ansi 60_iso 60_hhkb
