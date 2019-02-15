@@ -28,7 +28,6 @@
 #define BACKLIGHT_LEVELS 5
 
 #define BACKLIGHT_BREATHING
-
 /* Set 0 if debouncing isn't needed */
 #define DEBOUNCING_DELAY 5
 
@@ -44,6 +43,8 @@
 #define RGBLIGHT_HUE_STEP 8
 #define RGBLIGHT_SAT_STEP 8
 #define RGBLIGHT_VAL_STEP 8
+#define RGBLIGHT_EFFECT_BREATHE_MAX 100
+#define RGBLIGHT_RAINBOW_SWIRL_RANGE 270
 
 /* Tap Dance */
 #define TAPPING_TERM 200
