@@ -5,8 +5,13 @@
 enum keyboard_layers {
   _BASE = 0, // Base Layer 
   _FKEYS,      // Control Layer
-  _CALC,      // Function Layer
-  RGB_LYR
+  _CALC      // Function Layer
+};
+
+enum keycodes{
+  RGB_LYR = SAFE_RANGE,
+  _EM1, //email 1 = frozen
+  _EM2 //email 2 = vincent
 };
 
 enum tap_dance{
@@ -39,12 +44,14 @@ user_config_t user_config;
 static int alttap_state = 0;
 
 // Backlight timeout feature
-#define BACKLIGHT_TIMEOUT 5    // in minutes
+#define BACKLIGHT_TIMEOUT 10    // in minutes
 static uint16_t idle_timer = 0;
 static uint8_t halfmin_counter = 0;
 bool status = true; 
 
 uint8_t layer;
+
+const uint8_t RGBLED_BREATHING_INTERVALS[] PROGMEM = {15, 20, 10, 5};
 
 void matrix_init_kb(void);
 void matrix_scan_kb(void);
@@ -96,7 +103,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  //        * |-----------------------------------------------------------|
  //  RGB   * |RGB_LY|Tog|MOD|mod|HUE|hue|SAT|sat|VAL|val|SPD|spd|  |Print|
  //        * |-----------------------------------------------------------|
- //  mode  * |#######| Pl| Br| Ra| Sw| Sn| Kn| Xm| Gr|   |   |   |###### |
+ //  mode  * |#######| Pl| Br| Ra| Sw| Sn| Kn| Xm| Gr|   |EM1|EM2|###### |
  //        * |-----------------------------------------------------------|
  //  led   * |#####   |Tog|Cyc| On|Off| +|  -| Br|   |   |#####|VOL|Mute |
  //        * |-----------------------------------------------------------|
@@ -106,7 +113,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_FKEYS] = LAYOUT_60_b_ansi(
     KC_GRV,      KC_F1,      KC_F2,      KC_F3,      KC_F4,      KC_F5,      KC_F6,      KC_F7,      KC_F8,      KC_F9,      KC_F10,      KC_F11,      KC_F12,      KC_DEL,      KC_DEL,      
     RGB_LYR,     RGB_TOG,    RGB_MOD,    RGB_RMOD,   RGB_HUI,    RGB_HUD,    RGB_SAI,    RGB_SAD,    RGB_VAI,    RGB_VAD,    RGB_SPI,     RGB_SPD,     KC_NO,       KC_PSCR,      
-    KC_TRNS,     RGB_M_P,    RGB_M_B,    RGB_M_R,    RGB_M_SW,   RGB_M_SN,   RGB_M_K,    RGB_M_X,    RGB_M_G,    KC_NO,      KC_NO,       KC_NO,       KC_TRNS,      
+    KC_TRNS,     RGB_M_P,    RGB_M_B,    RGB_M_R,    RGB_M_SW,   RGB_M_SN,   RGB_M_K,    RGB_M_X,    RGB_M_G,    KC_NO,      _EM1,         _EM2,       KC_TRNS,      
     KC_TRNS,     BL_TOGG,    BL_STEP,    BL_ON,      BL_OFF,     BL_INC,     BL_DEC,     BL_BRTG,    KC_NO,      KC_NO,      KC_TRNS,     KC_VOLU,     KC_MUTE,      
     KC_TRNS,     KC_TRNS,    KC_LALT,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_MPRV,    KC_VOLD,    KC_MNXT),
 	
@@ -117,7 +124,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    * |--------------------------------------------------------------------|
    * |     |  7|  8|  9|   |   |   |   | / | * | - | + |   |    ######    |
    * |--------------------------------------------------------------------|
-   * |       |  4|  5|  6|   |   |   | . | , |   |   |   |      return    |
+   * | NumLk |  4|  5|  6|   |   |   | . | , |   |   |   |      return    |
    * |--------------------------------------------------------------------|
    * |        |  1|  2|  3|   |   | = |   |   |   |   |       | ^ | RESET |
    * |--------------------------------------------------------------------|
@@ -126,11 +133,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   */
 
   [_CALC] = LAYOUT_60_b_ansi(
-    KC_TRNS,    KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_BSPC,      KC_BSPC,      
-    KC_NO,      KC_P7,        KC_P8,        KC_P9,        KC_NO,        KC_NO,      KC_NO,      KC_NO,      KC_PSLS,    KC_PAST,    KC_PMNS,    KC_PPLS,    KC_NO,      KC_TRNS,      
-    KC_NO,      KC_P4,        KC_P5,        KC_P6,        KC_NO,        KC_NO,      KC_NO,      KC_PDOT,    KC_PCMM,    KC_NO,      KC_NO,      KC_NO,      KC_PENT,      
-    KC_NO,      KC_P1,        KC_P2,        KC_P3,        KC_NO,        KC_NO,      KC_PEQL,    KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_UP,      KC_NO,
-    KC_NO,      KC_NO,        KC_TRNS,      KC_P0,        KC_P0,        KC_P0,      KC_NO,      KC_TRNS,    KC_LEFT,    KC_DOWN,    KC_RGHT)
+    KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS,      KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_TRNS,    KC_BSPC,      KC_BSPC,      
+    KC_NO,        KC_P7,        KC_P8,        KC_P9,        KC_NO,        KC_NO,      KC_NO,      KC_NO,      KC_PSLS,    KC_PAST,    KC_PMNS,    KC_PPLS,    KC_NO,      KC_TRNS,      
+    KC_NUMLOCK,   KC_P4,        KC_P5,        KC_P6,        KC_NO,        KC_NO,      KC_NO,      KC_PDOT,    KC_PCMM,    KC_NO,      KC_NO,      KC_NO,      KC_PENT,      
+    KC_NO,        KC_P1,        KC_P2,        KC_P3,        KC_NO,        KC_NO,      KC_PEQL,    KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_UP,      KC_NO,
+    KC_NO,        KC_NO,        KC_TRNS,      KC_P0,        KC_P0,        KC_P0,      KC_NO,      KC_TRNS,    KC_LEFT,    KC_DOWN,    KC_RGHT)
 };
 
 void matrix_init_kb(void) {
@@ -140,8 +147,8 @@ void matrix_init_kb(void) {
 
   if(user_config.rgb_layer_change) {
     rgblight_enable_noeeprom();
-    rgblight_sethsv_noeeprom_turquoise(); 
     rgblight_mode_noeeprom(1);
+    rgblight_sethsv_noeeprom (131,  121, 112);
   }
 
   matrix_init_user();
@@ -177,8 +184,8 @@ void eeconfig_init_user(void) {  // EEPROM is getting reset!
 
   // use the non noeeprom versions, to write these values to EEPROM too
   rgblight_enable(); // Enable RGB by default
-  rgblight_sethsv_turquoise();  // Set it to CYAN by default
   rgblight_mode(1); // set to solid by default
+  rgblight_sethsv(131,  121, 112);  // Set it to TURQUOISE by default
 }
 
 void led_init_ports(void) {
@@ -189,10 +196,19 @@ void led_init_ports(void) {
 }
 
 void led_set_kb(uint8_t usb_led) {
-    if (usb_led & (1 << USB_LED_CAPS_LOCK)) {
-        PORTB &= ~(1 << 2);
-    } else {
-        PORTB |= (1 << 2);
+    layer = biton32(layer_state);
+    if(layer != _CALC){
+      if (usb_led & (1 << USB_LED_CAPS_LOCK)) {
+          PORTB &= ~(1 << 2);
+      } else {
+          PORTB |= (1 << 2);
+      }
+    } else{
+      if (usb_led & (1 << USB_LED_NUM_LOCK)) {
+          PORTB &= ~(1 << 2);
+      } else {
+          PORTB |= (1 << 2);
+      }
     }
 
     led_set_user(usb_led);
@@ -228,7 +244,7 @@ uint32_t layer_state_set_user(uint32_t state) { // Runs everytime changing layer
         if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(14); rgblight_sethsv_noeeprom(0,210,120); } //14
         break;
     default: //  for any other layers, or the default layer
-        if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(1); rgblight_sethsv_noeeprom_turquoise(); }
+        if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(1); rgblight_sethsv_noeeprom (131,  121, 112);}
         break;
     }
   return state;
@@ -250,12 +266,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) { // Adds anothe
       switch (layer) {
       case _CALC:
           if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(15); rgblight_sethsv_noeeprom_coral();  } //4
+
           break;
       case _FKEYS:
           if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(14); rgblight_sethsv_noeeprom(0,210,120); } //14
           break;
       default: //  for any other layers, or the default layer
-          if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(1); rgblight_sethsv_noeeprom_turquoise(); }
+          if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(1); rgblight_sethsv_noeeprom (131,  121, 112);}
           break;
       }
     }
@@ -279,6 +296,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) { // Adds anothe
             }
         }
         return true; break;
+    case _EM1:
+        if (record->event.pressed) {
+            SEND_STRING("email1");
+        }
+        return false; break;
+    case _EM2:
+        if (record->event.pressed) {
+            SEND_STRING("email2");
+        }
+        return false; break;
     default:
       return true; // Process all other keycodes normally
   }
