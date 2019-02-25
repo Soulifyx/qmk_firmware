@@ -47,6 +47,7 @@ static int alttap_state = 0;
 #define BACKLIGHT_TIMEOUT 10    // in minutes
 static uint16_t idle_timer = 0;
 static uint8_t halfmin_counter = 0;
+bool backlight_status = true;
 bool status = true; 
 
 uint8_t layer;
@@ -148,7 +149,7 @@ void matrix_init_kb(void) {
   if(user_config.rgb_layer_change) {
     rgblight_enable_noeeprom();
     rgblight_mode_noeeprom(1);
-    rgblight_sethsv_noeeprom (131,  121, 112);
+    rgblight_sethsv_noeeprom (131,  111, 99);
   }
 
   matrix_init_user();
@@ -172,6 +173,7 @@ void matrix_scan_kb(void) {
 
   if(halfmin_counter >= BACKLIGHT_TIMEOUT * 2){
     status = false;
+    backlight_status = is_backlight_enabled();
     backlight_disable();
     rgblight_mode_noeeprom(2); rgblight_sethsv_noeeprom(270,200,30);
     halfmin_counter = 0;
@@ -185,7 +187,7 @@ void eeconfig_init_user(void) {  // EEPROM is getting reset!
   // use the non noeeprom versions, to write these values to EEPROM too
   rgblight_enable(); // Enable RGB by default
   rgblight_mode(1); // set to solid by default
-  rgblight_sethsv(131,  121, 112);  // Set it to TURQUOISE by default
+  rgblight_sethsv(131,  111, 99);  // Set it to TURQUOISE by default
 }
 
 void led_init_ports(void) {
@@ -244,7 +246,7 @@ uint32_t layer_state_set_user(uint32_t state) { // Runs everytime changing layer
         if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(14); rgblight_sethsv_noeeprom(0,210,120); } //14
         break;
     default: //  for any other layers, or the default layer
-        if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(1); rgblight_sethsv_noeeprom (131,  121, 112);}
+        if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(1); rgblight_sethsv_noeeprom (131,  111, 99);}
         break;
     }
   return state;
@@ -260,7 +262,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) { // Adds anothe
 
     if(!status){
       layer = biton32(layer_state);
-      backlight_enable();
+      if(backlight_status){
+        backlight_enable();
+      }
       status = true;
 
       switch (layer) {
@@ -272,7 +276,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) { // Adds anothe
           if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(14); rgblight_sethsv_noeeprom(0,210,120); } //14
           break;
       default: //  for any other layers, or the default layer
-          if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(1); rgblight_sethsv_noeeprom (131,  121, 112);}
+          if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(1); rgblight_sethsv_noeeprom (131,  111, 99);}
           break;
       }
     }
@@ -298,12 +302,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) { // Adds anothe
         return true; break;
     case _EM1:
         if (record->event.pressed) {
-            SEND_STRING("email1");
+            SEND_STRING("frozen_soul80@yahoo.com");
         }
         return false; break;
     case _EM2:
         if (record->event.pressed) {
-            SEND_STRING("email2");
+            SEND_STRING("vincentandrian26@gmail.com");
         }
         return false; break;
     default:
