@@ -152,7 +152,7 @@ void matrix_init_kb(void) {
   if(user_config.rgb_layer_change) {
     rgblight_enable_noeeprom();
     rgblight_mode_noeeprom(1);
-    rgblight_sethsv_noeeprom (131,  111, 99);
+    rgblight_sethsv_noeeprom (146,  201, 104);
   }
 
   matrix_init_user();
@@ -190,7 +190,7 @@ void eeconfig_init_user(void) {  // EEPROM is getting reset!
   // use the non noeeprom versions, to write these values to EEPROM too
   rgblight_enable(); // Enable RGB by default
   rgblight_mode(1); // set to solid by default
-  rgblight_sethsv(131,  111, 99);  // Set it to TURQUOISE by default
+  rgblight_sethsv(146,  201, 104);  // Set it to TURQUOISE by default
 }
 
 void led_init_ports(void) {
@@ -254,7 +254,7 @@ uint32_t layer_state_set_user(uint32_t state) { // Runs everytime changing layer
         if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(14); rgblight_sethsv_noeeprom(0,210,120); } //14
         break;
     default: //  for any other layers, or the default layer
-        if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(1); rgblight_sethsv_noeeprom (131,  111, 99);}
+        if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(1); rgblight_sethsv_noeeprom (146,  201, 104);}
         break;
     }
   return state;
@@ -284,7 +284,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) { // Adds anothe
           if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(14); rgblight_sethsv_noeeprom(0,210,120); } //14
           break;
       default: //  for any other layers, or the default layer
-          if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(1); rgblight_sethsv_noeeprom (131,  111, 99);}
+          if (user_config.rgb_layer_change) { rgblight_mode_noeeprom(1); rgblight_sethsv_noeeprom (146,  201, 104);}
           break;
       }
     }
